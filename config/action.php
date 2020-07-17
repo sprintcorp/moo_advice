@@ -1,6 +1,7 @@
 <?php
 include_once 'db.php';
 
+
 class Action extends DbConfig
 {
     public function __construct()
@@ -22,6 +23,29 @@ class Action extends DbConfig
          }  
     } 
 
+    public function update($table_name, $fields, $where_condition)  
+      {  
+           $query = '';  
+           $condition = '';  
+           foreach($fields as $key => $value)  
+           {  
+                $query .= $key . "='".$value."', ";  
+           }  
+           $query = substr($query, 0, -2);  
+            
+           foreach($where_condition as $key => $value)  
+           {  
+                $condition .= $key . "='".$value."' AND ";  
+           }  
+           $condition = substr($condition, 0, -5);  
+           
+           $query = "UPDATE ".$table_name." SET ".$query." WHERE ".$condition."";  
+           if(mysqli_query($this->connection, $query))  
+           {  
+                return true;  
+           }  
+      }  
+
     public function browse($table_name, $where_condition)  
       {  
            $condition = '';  
@@ -32,60 +56,37 @@ class Action extends DbConfig
            }  
            $condition = substr($condition, 0, -5);  
            $query = "SELECT * FROM ".$table_name." WHERE " . $condition;  
-           $result = mysqli_query($this->connection, $query);  
-        //    while($row = mysqli_fetch_assoc($result))  
-        //    {  
-        //         $array[] = $row;  
-        //    } 
-         
+           $result = mysqli_query($this->connection, $query);           
            return mysqli_fetch_assoc($result);  
       }
+   
+      public function read($table_name)  
+      {  
+        $array = array();  
+        $query = "SELECT * FROM ".$table_name."";  
+        $result = mysqli_query($this->connection, $query);  
+        while($row = mysqli_fetch_assoc($result))  
+        {  
+             $array[] = $row;  
+        }  
+        return $array; 
+      }
+
+      public function login($table_name, $data)  
+      {  
+           $condition = '';  
+           $array = array();  
+           foreach($data as $key => $value)  
+           {  
+                $condition .= $key . " = '".$value."' AND ";  
+           }  
+           $condition = substr($condition, 0, -5);  
+           $query = "SELECT * FROM ".$table_name." WHERE " . $condition;  
+           $result = mysqli_query($this->connection, $query);           
+           return mysqli_fetch_assoc($result) ? true : false;  
+      }
     
-    public function getData($table)
-    {        
-        $query = "SELECT * FROM $table ORDER BY id DESC";
-        $result = $this->connection->query($query);
-        
-        if ($result == false) {
-            return false;
-        } 
-        
-        $rows = array();
-        
-        while ($row = $result->fetch_assoc()) {
-            $rows[] = $row;
-        }
-        
-        return $rows;
-    }
-        
-    public function execute($query) 
-    {
-        var_dump($query);
-        $result = $this->connection->query($query);
-        
-        
-        if ($result == false) {
-            echo 'Error: cannot execute the command'.$this->connection->error;
-            return false;
-        } else {
-            return true;
-        }        
-    }
     
-    public function delete($id, $table) 
-    { 
-        $query = "DELETE FROM $table WHERE id = $id";
-        
-        $result = $this->connection->query($query);
-    
-        if ($result == false) {
-            echo 'Error: cannot delete id ' . $id . ' from table ' . $table;
-            return false;
-        } else {
-            return true;
-        }
-    }
  
     public function escape_string($value)
     {

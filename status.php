@@ -1,58 +1,14 @@
 <?php
-include_once ('config/action.php');
-if(!$_SESSION['authorized']){
-    header('location:login.php');
+include_once ('config/init.php');
+if(empty($_SESSION['authorized'])){
+    header('location:login.php'); 
 }
+
+$template = new Template('view/status.php');
 $action = new Action();
-$condition = array(  
+$template->condition = array(  
     'access_code'     =>     $_SESSION['access_code']  
 );
-$user = $action->browse('user',$condition);
-
-?><html>
-
-<head>
-    <title>PHP TEST</title>
-    <link href="css/style.css" type="text/css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
-</head>
-
-<body>
-    <div class="container">
-        <div class="row h-100 pa-5">
-            <div class="col-sm-12 my-auto">
-                <div class="card card-block p-5">
-                    <div class="row mb-4">
-                        <h1 class="m-auto">
-                            APPLICATION STATUS
-                        </h1>
-
-                    </div>
-                    <div class="row mb-4">
-                        <div class="m-auto" style="border:1px solid;height:200px;width:200px">
-                            <img src="<?php echo "upload/".$user['image']?>" style="width:200px;height:200px" />
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-9">
-                            <h4>
-                                I “
-                                <?php echo['firstname'] ?> Last name “ , applied with the application code “ Acess
-                                Code”.
-                                I live at “Address” and I was born on “ Date of Birth.”
-                                My favourite subjects are “List the subjects filled by user on apply.php”.
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-</body>
-
-</html>
+$template->user = $action->browse('user',$template->condition);
+echo $template;
+?>
